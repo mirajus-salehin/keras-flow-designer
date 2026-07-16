@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  keras-flow-designer:
+    container_name: keras-flow-designer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: always
