@@ -4,10 +4,72 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>keras-flow-designer</title>
+    
+    <!-- Theme color for PWA/Mobile browsers -->
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.jpg" />
+
+    <!-- SEO Meta Tags for Google Search -->
+    <title>Keras Flow Designer - Visual Neural Network Builder & IDE</title>
+    <meta name="description" content="Design, compile, validate, and export Keras/TensorFlow and PyTorch neural networks visually in the browser. Features shape propagation, FLOP metrics, and drag-and-drop workflow." />
+    <meta name="keywords" content="Keras, TensorFlow, PyTorch, Deep Learning, Neural Network Designer, Visual Builder, Model Architect, Machine Learning, Drag and Drop Model, Python Code Generator" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://keras-flow-designer.netlify.app/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://keras-flow-designer.netlify.app/" />
+    <meta property="og:title" content="Keras Flow Designer - Visual Neural Network Builder & IDE" />
+    <meta property="og:description" content="Design, compile, validate, and export Keras/TensorFlow and PyTorch neural networks visually in the browser." />
+    <meta property="og:image" content="/icon-512.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://keras-flow-designer.netlify.app/" />
+    <meta property="twitter:title" content="Keras Flow Designer - Visual Neural Network Builder & IDE" />
+    <meta property="twitter:description" content="Design, compile, validate, and export Keras/TensorFlow and PyTorch neural networks visually in the browser." />
+    <meta property="twitter:image" content="/icon-512.jpg" />
+
+    <!-- JSON-LD Structured Data for WebApplication (Google Rich Results) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Keras Flow Designer",
+        "url": "https://keras-flow-designer.netlify.app/",
+        "description": "An interactive, web-based visual programming IDE for designing, validating, and exporting TensorFlow/Keras and PyTorch deep learning models.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "All",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "featureList": [
+          "Drag-and-drop neural network builder",
+          "Real-time shape propagation",
+          "FLOP and trainable weight estimations",
+          "Multi-framework code generation for Keras, PyTorch, and TensorFlow.js",
+          "Automated model topology validation",
+          "Progressive Web App support with offline access"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Register Service Worker for PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('ServiceWorker registered successfully with scope: ', registration.scope);
+            })
+            .catch((err) => {
+              console.warn('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
