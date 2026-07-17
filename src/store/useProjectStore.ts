@@ -115,7 +115,8 @@ const DEFAULT_TRAINING_CONFIG: TrainingConfig = {
     earlyStopping: { enabled: false, monitor: 'val_loss', patience: 3, restoreBestWeights: true },
     reduceLROnPlateau: { enabled: false, monitor: 'val_loss', factor: 0.1, patience: 2, minLR: 1e-6 },
     checkpoint: { enabled: false, filepath: 'model_checkpoint.keras', saveBestOnly: true, monitor: 'val_loss' },
-    tensorBoard: { enabled: false, logDir: './logs', histogramFreq: 1 }
+    tensorBoard: { enabled: false, logDir: './logs', histogramFreq: 1 },
+    csvLogger: { enabled: false, filepath: 'training_log.csv', separator: ',', append: false }
   }
 };
 

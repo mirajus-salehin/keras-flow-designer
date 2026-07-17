@@ -585,6 +585,84 @@ export const LayerLibrary: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* CSV Logger */}
+              <div className="space-y-1.5 border border-slate-100 dark:border-cyber-800 p-2 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">CSV Logger</span>
+                  <input
+                    type="checkbox"
+                    checked={!!(trainingConfig.callbacks as any).csvLogger?.enabled}
+                    onChange={(e) => updateTrainingConfig({
+                      callbacks: {
+                        ...trainingConfig.callbacks,
+                        csvLogger: {
+                          ...((trainingConfig.callbacks as any).csvLogger || { filepath: 'training_log.csv', separator: ',', append: false }),
+                          enabled: e.target.checked
+                        }
+                      } as any
+                    })}
+                    className="rounded border-slate-350 text-blue-600 focus:ring-blue-500"
+                  />
+                </div>
+                {!!(trainingConfig.callbacks as any).csvLogger?.enabled && (
+                  <div className="space-y-1.5 pt-1 text-[9px]">
+                    <div>
+                      <span className="font-bold text-slate-405 dark:text-slate-400">File Path</span>
+                      <input
+                        type="text"
+                        value={(trainingConfig.callbacks as any).csvLogger?.filepath || 'training_log.csv'}
+                        onChange={(e) => updateTrainingConfig({
+                          callbacks: {
+                            ...trainingConfig.callbacks,
+                            csvLogger: {
+                              ...((trainingConfig.callbacks as any).csvLogger),
+                              filepath: e.target.value
+                            }
+                          } as any
+                        })}
+                        className="w-full bg-slate-50 dark:bg-cyber-950 text-[10px] rounded p-1 border border-slate-200 dark:border-cyber-800"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <div>
+                        <span className="font-bold text-slate-405 dark:text-slate-400">Separator</span>
+                        <input
+                          type="text"
+                          value={(trainingConfig.callbacks as any).csvLogger?.separator || ','}
+                          onChange={(e) => updateTrainingConfig({
+                            callbacks: {
+                              ...trainingConfig.callbacks,
+                              csvLogger: {
+                                ...((trainingConfig.callbacks as any).csvLogger),
+                                separator: e.target.value
+                              }
+                            } as any
+                          })}
+                          className="w-full bg-slate-50 dark:bg-cyber-950 text-[10px] rounded p-1 border border-slate-200 dark:border-cyber-800 text-center font-mono"
+                        />
+                      </div>
+                      <div className="flex items-center justify-between pt-3">
+                        <span className="font-bold text-slate-405 dark:text-slate-400">Append</span>
+                        <input
+                          type="checkbox"
+                          checked={!!(trainingConfig.callbacks as any).csvLogger?.append}
+                          onChange={(e) => updateTrainingConfig({
+                            callbacks: {
+                              ...trainingConfig.callbacks,
+                              csvLogger: {
+                                ...((trainingConfig.callbacks as any).csvLogger),
+                                append: e.target.checked
+                              }
+                            } as any
+                          })}
+                          className="rounded border-slate-350 text-blue-600 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

@@ -152,6 +152,64 @@ export const LAYER_DEFINITIONS: Record<string, LayerDefinition> = {
       }
     ]
   },
+  ImageInput: {
+    type: 'ImageInput',
+    category: 'INPUT',
+    label: 'Image Input',
+    description: 'Instantiates a Keras Input tensor customized for images. Produces a 4D tensor (batch, height, width, channels).',
+    inputsCount: 0,
+    outputsCount: 1,
+    params: [
+      { name: 'height', label: 'Height', type: 'number', default: 224, description: 'Image height.' },
+      { name: 'width', label: 'Width', type: 'number', default: 224, description: 'Image width.' },
+      { name: 'channels', label: 'Channels', type: 'number', default: 3, description: 'Image color channels (e.g. 3 for RGB, 1 for grayscale).' },
+      { name: 'dtype', label: 'Data Type', type: 'select', default: 'float32', options: ['float32', 'float64', 'int32', 'int64'], description: 'Data type expected by the input.' },
+      { name: 'name', label: 'Name', type: 'text', default: 'image_input', description: 'An optional name string for the layer.' }
+    ]
+  },
+  FeatureInput: {
+    type: 'FeatureInput',
+    category: 'INPUT',
+    label: '1D Feature Input',
+    description: 'Instantiates a Keras Input tensor customized for 1D feature vectors (tabular data). Produces a 2D tensor (batch, features).',
+    inputsCount: 0,
+    outputsCount: 1,
+    params: [
+      { name: 'features', label: 'Features Count', type: 'number', default: 100, description: 'Number of input features.' },
+      { name: 'dtype', label: 'Data Type', type: 'select', default: 'float32', options: ['float32', 'float64', 'int32', 'int64'], description: 'Data type expected by the input.' },
+      { name: 'name', label: 'Name', type: 'text', default: 'feature_input', description: 'An optional name string for the layer.' }
+    ]
+  },
+  SequenceInput: {
+    type: 'SequenceInput',
+    category: 'INPUT',
+    label: 'Sequence Input',
+    description: 'Instantiates a Keras Input tensor customized for sequence/temporal data. Produces a 3D tensor (batch, timesteps, features) compatible with Conv1D/LSTMs.',
+    inputsCount: 0,
+    outputsCount: 1,
+    params: [
+      { name: 'timesteps', label: 'Timesteps', type: 'number', default: 100, description: 'Sequence length (number of timesteps).' },
+      { name: 'features', label: 'Features Per Step', type: 'number', default: 64, description: 'Number of features per timestep.' },
+      { name: 'dtype', label: 'Data Type', type: 'select', default: 'float32', options: ['float32', 'float64', 'int32', 'int64'], description: 'Data type expected by the input.' },
+      { name: 'name', label: 'Name', type: 'text', default: 'sequence_input', description: 'An optional name string for the layer.' }
+    ]
+  },
+  VolumeInput: {
+    type: 'VolumeInput',
+    category: 'INPUT',
+    label: '3D Volume Input',
+    description: 'Instantiates a Keras Input tensor customized for 3D volumes (videos or 3D medical scans). Produces a 5D tensor (batch, depth, height, width, channels) compatible with Conv3D.',
+    inputsCount: 0,
+    outputsCount: 1,
+    params: [
+      { name: 'depth', label: 'Depth', type: 'number', default: 32, description: 'Volume depth/timesteps.' },
+      { name: 'height', label: 'Height', type: 'number', default: 32, description: 'Volume height.' },
+      { name: 'width', label: 'Width', type: 'number', default: 32, description: 'Volume width.' },
+      { name: 'channels', label: 'Channels', type: 'number', default: 1, description: 'Number of channels.' },
+      { name: 'dtype', label: 'Data Type', type: 'select', default: 'float32', options: ['float32', 'float64', 'int32', 'int64'], description: 'Data type expected by the input.' },
+      { name: 'name', label: 'Name', type: 'text', default: 'volume_input', description: 'An optional name string for the layer.' }
+    ]
+  },
 
   // --- CORE ---
   Dense: {

@@ -57,14 +57,32 @@ const parseTupleParam = (param: any, expectedLen: number, defaultVal: number): n
   return Array(expectedLen).fill(defaultVal);
 };
 
+// Helper to convert single values or array parameters into a number array with variable length
+const parseVariableTupleParam = (param: any, defaultVal = 32): number[] => {
+  if (typeof param === 'number') {
+    return [param];
+  }
+  if (Array.isArray(param)) {
+    return param.map(x => (typeof x === 'number' ? x : parseInt(x, 10) || defaultVal));
+  }
+  if (typeof param === 'string') {
+    const cleaned = param.replace(/[()\[\]\s]/g, '');
+    if (!cleaned) return [];
+    return cleaned.split(',').map(x => parseInt(x, 10) || defaultVal);
+  }
+  return [];
+};
+
 export const computeOutputShape = (
   layerType: string,
   inputShapes: (number | null)[][],
   params: Record<string, any>,
   dataset: DatasetConfig
 ): (number | null)[] => {
+  const isInputLayer = ['Input', 'InputLayer', 'ImageInput', 'FeatureInput', 'SequenceInput', 'VolumeInput'].includes(layerType);
+
   // If no inputs and not an Input layer, shape is undetermined
-  if (inputShapes.length === 0 && layerType !== 'Input' && layerType !== 'InputLayer') {
+  if (inputShapes.length === 0 && !isInputLayer) {
     return [null, null];
   }
 
@@ -73,14 +91,40 @@ export const computeOutputShape = (
   switch (layerType) {
     case 'Input': {
       const shapeVal = params.shape;
-      const parsedShape = parseTupleParam(shapeVal, 1, 224);
+      const parsedShape = parseVariableTupleParam(shapeVal, 224);
       return [params.batch_size !== null ? params.batch_size : null, ...parsedShape];
     }
     
     case 'InputLayer': {
       const shapeVal = params.input_shape;
-      const parsedShape = parseTupleParam(shapeVal, 1, 224);
+      const parsedShape = parseVariableTupleParam(shapeVal, 224);
       return [null, ...parsedShape];
+    }
+
+    case 'ImageInput': {
+      const h = parseInt(params.height, 10) || 224;
+      const w = parseInt(params.width, 10) || 224;
+      const c = parseInt(params.channels, 10) || 3;
+      return [null, h, w, c];
+    }
+
+    case 'FeatureInput': {
+      const f = parseInt(params.features, 10) || 100;
+      return [null, f];
+    }
+
+    case 'SequenceInput': {
+      const t = parseInt(params.timesteps, 10) || 100;
+      const f = parseInt(params.features, 10) || 64;
+      return [null, t, f];
+    }
+
+    case 'VolumeInput': {
+      const d = parseInt(params.depth, 10) || 32;
+      const h = parseInt(params.height, 10) || 32;
+      const w = parseInt(params.width, 10) || 32;
+      const c = parseInt(params.channels, 10) || 1;
+      return [null, d, h, w, c];
     }
 
     case 'Dense': {
@@ -106,12 +150,12 @@ export const computeOutputShape = (
 
     case 'Reshape': {
       const batch = primaryInput[0];
-      const targetShape = parseTupleParam(params.target_shape, 1, -1);
+      const targetShape = parseVariableTupleParam(params.target_shape, 1);
       return [batch, ...targetShape];
     }
 
     case 'Permute': {
-      const dims = parseTupleParam(params.dims, primaryInput.length - 1, 1);
+      const dims = parseVariableTupleParam(params.dims, 1);
       // dims are 1-indexed references to dimensions excluding batch
       const out = [primaryInput[0]];
       for (let i = 0; i < dims.length; i++) {

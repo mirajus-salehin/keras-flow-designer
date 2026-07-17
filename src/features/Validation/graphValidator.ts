@@ -13,7 +13,7 @@ export const validateGraph = (
   }
 
   // 1. Check for Missing Input Layers
-  const inputNodes = nodes.filter(n => n.data.layerType === 'Input' || n.data.layerType === 'InputLayer');
+  const inputNodes = nodes.filter(n => ['Input', 'InputLayer', 'ImageInput', 'FeatureInput', 'SequenceInput', 'VolumeInput'].includes(n.data.layerType));
   if (inputNodes.length === 0) {
     // Flag the first node (or add a general warning, but we must associate it with a nodeId or target)
     errors.push({
@@ -75,7 +75,7 @@ export const validateGraph = (
 
     const hasIncoming = edges.some(e => e.target === node.id);
     const hasOutgoing = edges.some(e => e.source === node.id);
-    const isInput = node.data.layerType === 'Input' || node.data.layerType === 'InputLayer';
+    const isInput = ['Input', 'InputLayer', 'ImageInput', 'FeatureInput', 'SequenceInput', 'VolumeInput'].includes(node.data.layerType);
 
     if (!isInput && !hasIncoming) {
       errors.push({

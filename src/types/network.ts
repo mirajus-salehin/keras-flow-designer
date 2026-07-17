@@ -91,6 +91,12 @@ export interface CallbackConfig {
     logDir: string;
     histogramFreq: number;
   };
+  csvLogger: {
+    enabled: boolean;
+    filepath: string;
+    separator: string;
+    append: boolean;
+  };
 }
 
 export interface TrainingConfig {

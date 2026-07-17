@@ -51,6 +51,14 @@ export const CustomNode: React.FC<NodeProps> = ({ id, data, selected }) => {
       case 'InputLayer':
         const shape = p.shape || p.input_shape || [];
         return `Shape: [${Array.isArray(shape) ? shape.join(', ') : shape}]`;
+      case 'ImageInput':
+        return `Size: ${p.width || 224}x${p.height || 224}x${p.channels || 3}`;
+      case 'FeatureInput':
+        return `Features: ${p.features || 100}`;
+      case 'SequenceInput':
+        return `Seq: ${p.timesteps || 100}x${p.features || 64}`;
+      case 'VolumeInput':
+        return `Vol: ${p.depth || 32}x${p.height || 32}x${p.width || 32}x${p.channels || 1}`;
       default:
         return '';
     }

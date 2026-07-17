@@ -140,11 +140,22 @@ export const generateFunctionalCode = (
     // Incoming inputs
     const incoming = edges.filter(e => e.target === nodeId);
 
-    if (layerType === 'Input' || layerType === 'InputLayer') {
-      const shapeVal = layerType === 'Input' ? p.shape : p.input_shape;
+    const isInputLayer = ['Input', 'InputLayer', 'ImageInput', 'FeatureInput', 'SequenceInput', 'VolumeInput'].includes(layerType);
+    if (isInputLayer) {
+      let shapeTuple = '';
+      if (layerType === 'ImageInput') {
+        shapeTuple = `(${p.height || 224}, ${p.width || 224}, ${p.channels || 3})`;
+      } else if (layerType === 'FeatureInput') {
+        shapeTuple = `(${p.features || 100},)`;
+      } else if (layerType === 'SequenceInput') {
+        shapeTuple = `(${p.timesteps || 100}, ${p.features || 64})`;
+      } else if (layerType === 'VolumeInput') {
+        shapeTuple = `(${p.depth || 32}, ${p.height || 32}, ${p.width || 32}, ${p.channels || 1})`;
+      } else {
+        const shapeVal = layerType === 'Input' ? p.shape : p.input_shape;
+        shapeTuple = Array.isArray(shapeVal) ? `(${shapeVal.join(', ')})` : `(${shapeVal})`;
+      }
       const dtype = p.dtype || 'float32';
-      const shapeTuple = Array.isArray(shapeVal) ? `(${shapeVal.join(', ')})` : `(${shapeVal})`;
-      
       codeLines.push(`${cleanName} = keras.Input(shape=${shapeTuple}, dtype="${dtype}", name="${cleanName}")`);
       inputVars.push(cleanName);
     } 
@@ -218,7 +229,7 @@ export const checkSequentialPossible = (
   const graphNodes = nodes.filter(n => n.data.layerType !== 'Comment' && n.data.layerType !== 'Group');
   if (graphNodes.length === 0) return false;
 
-  const inputNodes = graphNodes.filter(n => n.data.layerType === 'Input' || n.data.layerType === 'InputLayer');
+  const inputNodes = graphNodes.filter(n => ['Input', 'InputLayer', 'ImageInput', 'FeatureInput', 'SequenceInput', 'VolumeInput'].includes(n.data.layerType));
   if (inputNodes.length !== 1) return false; // Must have exactly 1 input layer
 
   // Walk from input node
@@ -268,10 +279,22 @@ export const generateSequentialCode = (
     const p = node.data.params;
     const isLast = idx === topoOrder.length - 1;
 
-    if (layerType === 'Input' || layerType === 'InputLayer') {
-      const shapeVal = layerType === 'Input' ? p.shape : p.input_shape;
+    const isInputLayer = ['Input', 'InputLayer', 'ImageInput', 'FeatureInput', 'SequenceInput', 'VolumeInput'].includes(layerType);
+    if (isInputLayer) {
+      let shapeTuple = '';
+      if (layerType === 'ImageInput') {
+        shapeTuple = `(${p.height || 224}, ${p.width || 224}, ${p.channels || 3})`;
+      } else if (layerType === 'FeatureInput') {
+        shapeTuple = `(${p.features || 100},)`;
+      } else if (layerType === 'SequenceInput') {
+        shapeTuple = `(${p.timesteps || 100}, ${p.features || 64})`;
+      } else if (layerType === 'VolumeInput') {
+        shapeTuple = `(${p.depth || 32}, ${p.height || 32}, ${p.width || 32}, ${p.channels || 1})`;
+      } else {
+        const shapeVal = layerType === 'Input' ? p.shape : p.input_shape;
+        shapeTuple = Array.isArray(shapeVal) ? `(${shapeVal.join(', ')})` : `(${shapeVal})`;
+      }
       const dtype = p.dtype || 'float32';
-      const shapeTuple = Array.isArray(shapeVal) ? `(${shapeVal.join(', ')})` : `(${shapeVal})`;
       codeLines.push(`    layers.Input(shape=${shapeTuple}, dtype="${dtype}")${isLast ? '' : ','}`);
     } 
     else if (layerType === 'Bidirectional') {
@@ -654,6 +677,18 @@ export const generateTrainingScript = (
       '    )'
     );
     callbacksList.push('tensorboard');
+  }
+
+  if ((trainingConfig.callbacks as any).csvLogger?.enabled) {
+    const csvCfg = (trainingConfig.callbacks as any).csvLogger;
+    callbacksDefinition.push(
+      '    csv_logger = keras.callbacks.CSVLogger(\n' +
+      `        filename="${csvCfg.filepath || 'training_log.csv'}",\n` +
+      `        separator="${csvCfg.separator || ','}",\n` +
+      `        append=${csvCfg.append ? 'True' : 'False'}\n` +
+      '    )'
+    );
+    callbacksList.push('csv_logger');
   }
 
   const callbackCodeBlock = callbacksDefinition.length > 0 
