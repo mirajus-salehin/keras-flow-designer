@@ -186,6 +186,38 @@ export const generateFunctionalCode = (
         `)(${callArgs})`
       );
     }
+    else if (layerType === 'RNN') {
+      const cellType = p.cell_type || 'LSTMCell';
+      const units = p.units || 32;
+      const returnSequences = p.return_sequences ? 'True' : 'False';
+      const parentVars = incoming.map(e => varNames[e.source] || 'None');
+      const callArgs = parentVars.length === 1 ? parentVars[0] : `[${parentVars.join(', ')}]`;
+      
+      if (cellType === 'StackedRNNCells') {
+        codeLines.push(`${cleanName} = layers.RNN(layers.StackedRNNCells([layers.LSTMCell(${units}), layers.LSTMCell(${units})]), return_sequences=${returnSequences})(${callArgs})`);
+      } else {
+        codeLines.push(`${cleanName} = layers.RNN(layers.${cellType}(${units}), return_sequences=${returnSequences})(${callArgs})`);
+      }
+    }
+    else if (layerType === 'StackedRNNCells') {
+      const parentVars = incoming.map(e => varNames[e.source] || 'None');
+      const callArgs = parentVars.length === 1 ? parentVars[0] : `[${parentVars.join(', ')}]`;
+      codeLines.push(`${cleanName} = layers.StackedRNNCells([layers.LSTMCell(32), layers.LSTMCell(64)])`);
+    }
+    else if (layerType === 'TimeDistributed') {
+      const inner = p.inner_layer || 'Dense';
+      const units = p.units || 64;
+      const parentVars = incoming.map(e => varNames[e.source] || 'None');
+      const callArgs = parentVars.length === 1 ? parentVars[0] : `[${parentVars.join(', ')}]`;
+      
+      if (inner === 'Dense') {
+        codeLines.push(`${cleanName} = layers.TimeDistributed(layers.Dense(${units}, activation="relu"))(${callArgs})`);
+      } else if (inner === 'Flatten') {
+        codeLines.push(`${cleanName} = layers.TimeDistributed(layers.Flatten())(${callArgs})`);
+      } else {
+        codeLines.push(`${cleanName} = layers.TimeDistributed(layers.${inner}())(${callArgs})`);
+      }
+    }
     else {
       const args = getKerasArgs(p, layerType);
       const parentVars = incoming.map(e => varNames[e.source] || 'None');
@@ -307,6 +339,30 @@ export const generateSequentialCode = (
         `        merge_mode="${mergeMode}"\n` +
         `    )${isLast ? '' : ','}`
       );
+    }
+    else if (layerType === 'RNN') {
+      const cellType = p.cell_type || 'LSTMCell';
+      const units = p.units || 32;
+      const returnSequences = p.return_sequences ? 'True' : 'False';
+      if (cellType === 'StackedRNNCells') {
+        codeLines.push(`    layers.RNN(layers.StackedRNNCells([layers.LSTMCell(${units}), layers.LSTMCell(${units})]), return_sequences=${returnSequences})${isLast ? '' : ','}`);
+      } else {
+        codeLines.push(`    layers.RNN(layers.${cellType}(${units}), return_sequences=${returnSequences})${isLast ? '' : ','}`);
+      }
+    }
+    else if (layerType === 'StackedRNNCells') {
+      codeLines.push(`    layers.StackedRNNCells([layers.LSTMCell(32), layers.LSTMCell(64)])${isLast ? '' : ','}`);
+    }
+    else if (layerType === 'TimeDistributed') {
+      const inner = p.inner_layer || 'Dense';
+      const units = p.units || 64;
+      if (inner === 'Dense') {
+        codeLines.push(`    layers.TimeDistributed(layers.Dense(${units}, activation="relu"))${isLast ? '' : ','}`);
+      } else if (inner === 'Flatten') {
+        codeLines.push(`    layers.TimeDistributed(layers.Flatten())${isLast ? '' : ','}`);
+      } else {
+        codeLines.push(`    layers.TimeDistributed(layers.${inner}())${isLast ? '' : ','}`);
+      }
     }
     else {
       const args = getKerasArgs(p, layerType);

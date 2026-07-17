@@ -357,13 +357,178 @@ export const LAYER_DEFINITIONS: Record<string, LayerDefinition> = {
     inputsCount: 1,
     outputsCount: 1,
     params: [
-      {
-        name: 'mask_value',
-        label: 'Mask Value',
-        type: 'number',
-        default: 0.0,
-        description: 'Value to mask.'
-      },
+      { name: 'mask_value', label: 'Mask Value', type: 'number', default: 0.0, description: 'Value to mask.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  ReLU: {
+    type: 'ReLU',
+    category: 'CORE',
+    label: 'ReLU',
+    description: 'Rectified Linear Unit activation layer.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'max_value', label: 'Max Value', type: 'number', default: null, description: 'Maximum activation value.' },
+      { name: 'negative_slope', label: 'Negative Slope', type: 'number', default: 0.0, description: 'Slope of negative section.' },
+      { name: 'threshold', label: 'Threshold', type: 'number', default: 0.0, description: 'Threshold value for activation.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  Softmax: {
+    type: 'Softmax',
+    category: 'CORE',
+    label: 'Softmax',
+    description: 'Softmax activation layer.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'axis', label: 'Axis', type: 'number', default: -1, description: 'Integer dimension along which softmax is applied.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  LeakyReLU: {
+    type: 'LeakyReLU',
+    category: 'CORE',
+    label: 'LeakyReLU',
+    description: 'Leaky version of a Rectified Linear Unit.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'alpha', label: 'Alpha', type: 'number', default: 0.2, description: 'Slope of negative section.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  PReLU: {
+    type: 'PReLU',
+    category: 'CORE',
+    label: 'PReLU',
+    description: 'Parametric Rectified Linear Unit.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'alpha_initializer', label: 'Alpha Initializer', type: 'select', default: 'zeros', options: ['zeros', 'ones', 'random_uniform'], description: 'Initializer function for alpha.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  ELU: {
+    type: 'ELU',
+    category: 'CORE',
+    label: 'ELU',
+    description: 'Exponential Linear Unit.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'alpha', label: 'Alpha', type: 'number', default: 1.0, description: 'Scale for negative section.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  Cropping1D: {
+    type: 'Cropping1D',
+    category: 'CORE',
+    label: 'Cropping 1D',
+    description: 'Cropping layer for 1D input (e.g. temporal sequence).',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'cropping', label: 'Cropping (tuple)', type: 'tuple', default: [1, 1], description: 'How many elements to crop from start and end.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  Cropping2D: {
+    type: 'Cropping2D',
+    category: 'CORE',
+    label: 'Cropping 2D',
+    description: 'Cropping layer for 2D input (e.g. spatial image).',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'cropping', label: 'Cropping (2-tuple of tuples)', type: 'tuple', default: [[1, 1], [1, 1]], description: 'How many elements to crop from top/bottom and left/right.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  Cropping3D: {
+    type: 'Cropping3D',
+    category: 'CORE',
+    label: 'Cropping 3D',
+    description: 'Cropping layer for 3D data (spatial or spatio-temporal).',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'cropping', label: 'Cropping (3-tuple of tuples)', type: 'tuple', default: [[1, 1], [1, 1], [1, 1]], description: 'How many elements to crop from depth, height, and width.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  UpSampling1D: {
+    type: 'UpSampling1D',
+    category: 'CORE',
+    label: 'UpSampling 1D',
+    description: 'Upsampling layer for 1D inputs.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'size', label: 'Size', type: 'number', default: 2, description: 'Upsampling factor.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  UpSampling2D: {
+    type: 'UpSampling2D',
+    category: 'CORE',
+    label: 'UpSampling 2D',
+    description: 'Upsampling layer for 2D inputs.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'size', label: 'Size (tuple)', type: 'tuple', default: [2, 2], description: 'Upsampling factors along height and width.' },
+      { name: 'interpolation', label: 'Interpolation', type: 'select', default: 'nearest', options: ['nearest', 'bilinear'], description: 'Interpolation method.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  UpSampling3D: {
+    type: 'UpSampling3D',
+    category: 'CORE',
+    label: 'UpSampling 3D',
+    description: 'Upsampling layer for 3D inputs.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'size', label: 'Size (3-tuple)', type: 'tuple', default: [2, 2, 2], description: 'Upsampling factors along depth, height and width.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  ZeroPadding1D: {
+    type: 'ZeroPadding1D',
+    category: 'CORE',
+    label: 'ZeroPadding 1D',
+    description: 'Zero-padding layer for 1D input (e.g. temporal sequence).',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'padding', label: 'Padding', type: 'tuple', default: [1, 1], description: 'How many zeros to add at start and end.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  ZeroPadding2D: {
+    type: 'ZeroPadding2D',
+    category: 'CORE',
+    label: 'ZeroPadding 2D',
+    description: 'Zero-padding layer for 2D input (e.g. image).',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'padding', label: 'Padding (tuple)', type: 'tuple', default: [[1, 1], [1, 1]], description: 'How many zeros to add at top/bottom and left/right.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  ZeroPadding3D: {
+    type: 'ZeroPadding3D',
+    category: 'CORE',
+    label: 'ZeroPadding 3D',
+    description: 'Zero-padding layer for 3D data (spatial or spatio-temporal).',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'padding', label: 'Padding (3-tuple of tuples)', type: 'tuple', default: [[1, 1], [1, 1], [1, 1]], description: 'How many zeros to add at depth, height, and width.' },
       { name: 'name', label: 'Name', type: 'text', default: '' }
     ]
   },
@@ -508,6 +673,39 @@ export const LAYER_DEFINITIONS: Record<string, LayerDefinition> = {
       { name: 'strides', label: 'Strides', type: 'tuple', default: [1, 1] },
       { name: 'padding', label: 'Padding', type: 'select', default: 'valid', options: ['valid', 'same'] },
       activationParam('relu'),
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  SeparableConv1D: {
+    type: 'SeparableConv1D',
+    category: 'CONVOLUTION',
+    label: 'Separable Conv1D',
+    description: 'Depthwise separable 1D convolution.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'filters', label: 'Filters', type: 'number', default: 32, min: 1 },
+      { name: 'kernel_size', label: 'Kernel Size', type: 'number', default: 3, min: 1 },
+      { name: 'strides', label: 'Strides', type: 'number', default: 1, min: 1 },
+      { name: 'padding', label: 'Padding', type: 'select', default: 'valid', options: ['valid', 'same'] },
+      activationParam('relu'),
+      useBiasParam(),
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  DepthwiseConv1D: {
+    type: 'DepthwiseConv1D',
+    category: 'CONVOLUTION',
+    label: 'Depthwise Conv1D',
+    description: 'Depthwise 1D convolution.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'kernel_size', label: 'Kernel Size', type: 'number', default: 3, min: 1 },
+      { name: 'strides', label: 'Strides', type: 'number', default: 1, min: 1 },
+      { name: 'padding', label: 'Padding', type: 'select', default: 'valid', options: ['valid', 'same'] },
+      activationParam('relu'),
+      useBiasParam(),
       { name: 'name', label: 'Name', type: 'text', default: '' }
     ]
   },
@@ -664,6 +862,78 @@ export const LAYER_DEFINITIONS: Record<string, LayerDefinition> = {
     outputsCount: 1,
     params: [
       { name: 'keepdims', label: 'Keep Dimensions', type: 'boolean', default: false },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  AdaptiveAveragePooling1D: {
+    type: 'AdaptiveAveragePooling1D',
+    category: 'POOLING',
+    label: 'Adaptive Avg Pooling 1D',
+    description: 'Adaptive average pooling for 1D inputs. Computes the pooling window size dynamically to achieve the target output size.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'output_size', label: 'Output Size', type: 'number', default: 10, description: 'Target output size.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  AdaptiveAveragePooling2D: {
+    type: 'AdaptiveAveragePooling2D',
+    category: 'POOLING',
+    label: 'Adaptive Avg Pooling 2D',
+    description: 'Adaptive average pooling for 2D inputs. Computes the pooling window size dynamically to achieve the target output size.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'output_size', label: 'Output Size (tuple)', type: 'tuple', default: [7, 7], description: 'Target output size (height, width).' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  AdaptiveAveragePooling3D: {
+    type: 'AdaptiveAveragePooling3D',
+    category: 'POOLING',
+    label: 'Adaptive Avg Pooling 3D',
+    description: 'Adaptive average pooling for 3D inputs. Computes the pooling window size dynamically to achieve the target output size.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'output_size', label: 'Output Size (3-tuple)', type: 'tuple', default: [7, 7, 7], description: 'Target output size (depth, height, width).' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  AdaptiveMaxPooling1D: {
+    type: 'AdaptiveMaxPooling1D',
+    category: 'POOLING',
+    label: 'Adaptive Max Pooling 1D',
+    description: 'Adaptive max pooling for 1D inputs. Computes the pooling window size dynamically to achieve the target output size.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'output_size', label: 'Output Size', type: 'number', default: 10, description: 'Target output size.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  AdaptiveMaxPooling2D: {
+    type: 'AdaptiveMaxPooling2D',
+    category: 'POOLING',
+    label: 'Adaptive Max Pooling 2D',
+    description: 'Adaptive max pooling for 2D inputs. Computes the pooling window size dynamically to achieve the target output size.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'output_size', label: 'Output Size (tuple)', type: 'tuple', default: [7, 7], description: 'Target output size (height, width).' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  AdaptiveMaxPooling3D: {
+    type: 'AdaptiveMaxPooling3D',
+    category: 'POOLING',
+    label: 'Adaptive Max Pooling 3D',
+    description: 'Adaptive max pooling for 3D inputs. Computes the pooling window size dynamically to achieve the target output size.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'output_size', label: 'Output Size (3-tuple)', type: 'tuple', default: [7, 7, 7], description: 'Target output size (depth, height, width).' },
       { name: 'name', label: 'Name', type: 'text', default: '' }
     ]
   },
@@ -865,16 +1135,141 @@ export const LAYER_DEFINITIONS: Record<string, LayerDefinition> = {
     inputsCount: 1,
     outputsCount: 1,
     params: [
-      {
-        name: 'layer_type',
-        label: 'Wrapped Layer',
-        type: 'select',
-        default: 'LSTM',
-        options: ['LSTM', 'GRU', 'SimpleRNN'],
-        description: 'The RNN layer instance to wrap.'
-      },
+      { name: 'layer_type', label: 'Wrapped Layer', type: 'select', default: 'LSTM', options: ['LSTM', 'GRU', 'SimpleRNN'], description: 'The RNN layer instance to wrap.' },
       { name: 'units', label: 'RNN Units', type: 'number', default: 32 },
       { name: 'merge_mode', label: 'Merge Mode', type: 'select', default: 'concat', options: ['sum', 'mul', 'concat', 'ave', 'None'] },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  LSTMCell: {
+    type: 'LSTMCell',
+    category: 'RECURRENT',
+    label: 'LSTM Cell',
+    description: 'Cell class for the LSTM layer.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'units', label: 'Units', type: 'number', default: 32 },
+      activationParam('tanh'),
+      { name: 'recurrent_activation', label: 'Recurrent Activation', type: 'select', default: 'sigmoid', options: ACTIVATION_OPTIONS },
+      useBiasParam(),
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  GRUCell: {
+    type: 'GRUCell',
+    category: 'RECURRENT',
+    label: 'GRU Cell',
+    description: 'Cell class for the GRU layer.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'units', label: 'Units', type: 'number', default: 32 },
+      activationParam('tanh'),
+      { name: 'recurrent_activation', label: 'Recurrent Activation', type: 'select', default: 'sigmoid', options: ACTIVATION_OPTIONS },
+      useBiasParam(),
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  SimpleRNNCell: {
+    type: 'SimpleRNNCell',
+    category: 'RECURRENT',
+    label: 'Simple RNN Cell',
+    description: 'Cell class for SimpleRNN.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'units', label: 'Units', type: 'number', default: 32 },
+      activationParam('tanh'),
+      useBiasParam(),
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  RNN: {
+    type: 'RNN',
+    category: 'RECURRENT',
+    label: 'RNN (Base)',
+    description: 'Base class for recurrent layers, instantiated with a cell.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'cell_type', label: 'RNN Cell Type', type: 'select', default: 'LSTMCell', options: ['LSTMCell', 'GRUCell', 'SimpleRNNCell', 'StackedRNNCells'] },
+      { name: 'units', label: 'Units', type: 'number', default: 32, description: 'Default units for cell initialization.' },
+      { name: 'return_sequences', label: 'Return Sequences', type: 'boolean', default: false },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  StackedRNNCells: {
+    type: 'StackedRNNCells',
+    category: 'RECURRENT',
+    label: 'Stacked RNN Cells',
+    description: 'Wrapper allowing a stack of RNN cells to behave as a single cell.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'cell_types_json', label: 'Cells list (JSON)', type: 'text', default: '["LSTMCell", "LSTMCell"]', description: 'List of cell names.' },
+      { name: 'units_json', label: 'Units list (JSON)', type: 'text', default: '[32, 64]', description: 'List of units per cell.' },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  TimeDistributed: {
+    type: 'TimeDistributed',
+    category: 'RECURRENT',
+    label: 'TimeDistributed',
+    description: 'This wrapper applies a layer to every temporal slice of an input.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'inner_layer', label: 'Layer to Wrap', type: 'select', default: 'Dense', options: ['Dense', 'Conv2D', 'Flatten'] },
+      { name: 'units', label: 'Inner Dense Units', type: 'number', default: 64 },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  ConvLSTM1D: {
+    type: 'ConvLSTM1D',
+    category: 'RECURRENT',
+    label: 'ConvLSTM1D',
+    description: '1D Convolutional LSTM layer.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'filters', label: 'Filters', type: 'number', default: 32 },
+      { name: 'kernel_size', label: 'Kernel Size', type: 'number', default: 3 },
+      { name: 'strides', label: 'Strides', type: 'number', default: 1 },
+      { name: 'padding', label: 'Padding', type: 'select', default: 'same', options: ['valid', 'same'] },
+      { name: 'return_sequences', label: 'Return Sequences', type: 'boolean', default: false },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  ConvLSTM2D: {
+    type: 'ConvLSTM2D',
+    category: 'RECURRENT',
+    label: 'ConvLSTM2D',
+    description: '2D Convolutional LSTM layer.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'filters', label: 'Filters', type: 'number', default: 32 },
+      { name: 'kernel_size', label: 'Kernel Size (tuple)', type: 'tuple', default: [3, 3] },
+      { name: 'strides', label: 'Strides (tuple)', type: 'tuple', default: [1, 1] },
+      { name: 'padding', label: 'Padding', type: 'select', default: 'same', options: ['valid', 'same'] },
+      { name: 'return_sequences', label: 'Return Sequences', type: 'boolean', default: false },
+      { name: 'name', label: 'Name', type: 'text', default: '' }
+    ]
+  },
+  ConvLSTM3D: {
+    type: 'ConvLSTM3D',
+    category: 'RECURRENT',
+    label: 'ConvLSTM3D',
+    description: '3D Convolutional LSTM layer.',
+    inputsCount: 1,
+    outputsCount: 1,
+    params: [
+      { name: 'filters', label: 'Filters', type: 'number', default: 32 },
+      { name: 'kernel_size', label: 'Kernel Size (3-tuple)', type: 'tuple', default: [3, 3, 3] },
+      { name: 'strides', label: 'Strides (3-tuple)', type: 'tuple', default: [1, 1, 1] },
+      { name: 'padding', label: 'Padding', type: 'select', default: 'same', options: ['valid', 'same'] },
+      { name: 'return_sequences', label: 'Return Sequences', type: 'boolean', default: false },
       { name: 'name', label: 'Name', type: 'text', default: '' }
     ]
   },

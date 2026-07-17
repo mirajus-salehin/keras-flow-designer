@@ -427,6 +427,250 @@ export const computeOutputShape = (
     case 'RandomContrast':
     case 'RandomZoom':
     case 'RandomTranslation':
+    case 'SeparableConv1D': {
+      const batch = primaryInput[0];
+      const length = primaryInput[1] || null;
+      const filters = parseInt(params.filters, 10) || 32;
+      const kernelSize = parseInt(params.kernel_size, 10) || 3;
+      const strides = parseInt(params.strides, 10) || 1;
+      const padding = params.padding || 'valid';
+      const newLength = getConvOutputDim(length, kernelSize, strides, padding);
+      return [batch, newLength, filters];
+    }
+    case 'DepthwiseConv1D': {
+      const batch = primaryInput[0];
+      const length = primaryInput[1] || null;
+      const channels = primaryInput[2] || null;
+      const kernelSize = parseInt(params.kernel_size, 10) || 3;
+      const strides = parseInt(params.strides, 10) || 1;
+      const padding = params.padding || 'valid';
+      const newLength = getConvOutputDim(length, kernelSize, strides, padding);
+      return [batch, newLength, channels];
+    }
+    case 'AdaptiveAveragePooling1D':
+    case 'AdaptiveMaxPooling1D': {
+      const batch = primaryInput[0];
+      const channels = primaryInput[2] || null;
+      const outSize = parseInt(params.output_size, 10) || 10;
+      return [batch, outSize, channels];
+    }
+    case 'AdaptiveAveragePooling2D':
+    case 'AdaptiveMaxPooling2D': {
+      const batch = primaryInput[0];
+      const channels = primaryInput[3] || null;
+      const outSize = parseVariableTupleParam(params.output_size, 7);
+      return [batch, outSize[0] || 7, outSize[1] || 7, channels];
+    }
+    case 'AdaptiveAveragePooling3D':
+    case 'AdaptiveMaxPooling3D': {
+      const batch = primaryInput[0];
+      const channels = primaryInput[4] || null;
+      const outSize = parseVariableTupleParam(params.output_size, 7);
+      return [batch, outSize[0] || 7, outSize[1] || 7, outSize[2] || 7, channels];
+    }
+    case 'LSTMCell':
+    case 'GRUCell':
+    case 'SimpleRNNCell': {
+      const batch = primaryInput[0];
+      const units = parseInt(params.units, 10) || 32;
+      return [batch, units];
+    }
+    case 'StackedRNNCells': {
+      const batch = primaryInput[0];
+      let unitsList: number[] = [32, 64];
+      try {
+        if (typeof params.units_json === 'string') {
+          unitsList = JSON.parse(params.units_json);
+        } else if (Array.isArray(params.units_json)) {
+          unitsList = params.units_json;
+        }
+      } catch (e) {}
+      const lastUnits = unitsList[unitsList.length - 1] || 32;
+      return [batch, lastUnits];
+    }
+    case 'RNN': {
+      const batch = primaryInput[0];
+      const timesteps = primaryInput[1] || null;
+      const units = parseInt(params.units, 10) || 32;
+      const returnSequences = !!params.return_sequences;
+      return returnSequences ? [batch, timesteps, units] : [batch, units];
+    }
+    case 'TimeDistributed': {
+      const batch = primaryInput[0];
+      const timesteps = primaryInput[1] || null;
+      const inner = params.inner_layer || 'Dense';
+      if (inner === 'Dense') {
+        const units = parseInt(params.units, 10) || 64;
+        return [batch, timesteps, units];
+      } else if (inner === 'Flatten') {
+        const rest = primaryInput.slice(2);
+        const flatSize = rest.some(dim => dim === null) ? null : rest.reduce((acc: number, val) => acc * (val || 1), 1);
+        return [batch, timesteps, flatSize];
+      } else {
+        // Fallback for Conv2D inner or other inside TimeDistributed
+        return [batch, timesteps, null];
+      }
+    }
+    case 'ConvLSTM1D': {
+      const batch = primaryInput[0];
+      const timesteps = primaryInput[1] || null;
+      const length = primaryInput[2] || null;
+      const filters = parseInt(params.filters, 10) || 32;
+      const kernelSize = parseInt(params.kernel_size, 10) || 3;
+      const strides = parseInt(params.strides, 10) || 1;
+      const padding = params.padding || 'same';
+      const newLength = getConvOutputDim(length, kernelSize, strides, padding);
+      const returnSequences = !!params.return_sequences;
+      return returnSequences ? [batch, timesteps, newLength, filters] : [batch, newLength, filters];
+    }
+    case 'ConvLSTM2D': {
+      const batch = primaryInput[0];
+      const timesteps = primaryInput[1] || null;
+      const h = primaryInput[2] || null;
+      const w = primaryInput[3] || null;
+      const filters = parseInt(params.filters, 10) || 32;
+      const kernel = parseVariableTupleParam(params.kernel_size, 3);
+      const stride = parseVariableTupleParam(params.strides, 1);
+      const padding = params.padding || 'same';
+      const newH = getConvOutputDim(h, kernel[0] || 3, stride[0] || 1, padding);
+      const newW = getConvOutputDim(w, kernel[1] || 3, stride[1] || 1, padding);
+      const returnSequences = !!params.return_sequences;
+      return returnSequences ? [batch, timesteps, newH, newW, filters] : [batch, newH, newW, filters];
+    }
+    case 'ConvLSTM3D': {
+      const batch = primaryInput[0];
+      const timesteps = primaryInput[1] || null;
+      const d = primaryInput[2] || null;
+      const h = primaryInput[3] || null;
+      const w = primaryInput[4] || null;
+      const filters = parseInt(params.filters, 10) || 32;
+      const kernel = parseVariableTupleParam(params.kernel_size, 3);
+      const stride = parseVariableTupleParam(params.strides, 1);
+      const padding = params.padding || 'same';
+      const newD = getConvOutputDim(d, kernel[0] || 3, stride[0] || 1, padding);
+      const newH = getConvOutputDim(h, kernel[1] || 3, stride[1] || 1, padding);
+      const newW = getConvOutputDim(w, kernel[2] || 3, stride[2] || 1, padding);
+      const returnSequences = !!params.return_sequences;
+      return returnSequences ? [batch, timesteps, newD, newH, newW, filters] : [batch, newD, newH, newW, filters];
+    }
+    case 'Cropping1D': {
+      const batch = primaryInput[0];
+      const len = primaryInput[1] || null;
+      const channels = primaryInput[2] || null;
+      const crop = parseVariableTupleParam(params.cropping, 1);
+      const cLeft = crop[0] || 1;
+      const cRight = crop[1] || 1;
+      return [batch, len !== null ? len - cLeft - cRight : null, channels];
+    }
+    case 'Cropping2D': {
+      const batch = primaryInput[0];
+      const h = primaryInput[1] || null;
+      const w = primaryInput[2] || null;
+      const channels = primaryInput[3] || null;
+      let cTop = 1, cBottom = 1, cLeft = 1, cRight = 1;
+      const crop = params.cropping;
+      if (Array.isArray(crop)) {
+        if (Array.isArray(crop[0])) {
+          cTop = parseInt(crop[0][0], 10) || 0;
+          cBottom = parseInt(crop[0][1], 10) || 0;
+        } else {
+          cTop = parseInt(crop[0], 10) || 0;
+          cBottom = cTop;
+        }
+        if (Array.isArray(crop[1])) {
+          cLeft = parseInt(crop[1][0], 10) || 0;
+          cRight = parseInt(crop[1][1], 10) || 0;
+        } else {
+          cLeft = parseInt(crop[1], 10) || 0;
+          cRight = cLeft;
+        }
+      }
+      return [batch, h !== null ? h - cTop - cBottom : null, w !== null ? w - cLeft - cRight : null, channels];
+    }
+    case 'Cropping3D': {
+      const batch = primaryInput[0];
+      const d = primaryInput[1] || null;
+      const h = primaryInput[2] || null;
+      const w = primaryInput[3] || null;
+      const channels = primaryInput[4] || null;
+      return [batch, d, h, w, channels];
+    }
+    case 'UpSampling1D': {
+      const batch = primaryInput[0];
+      const len = primaryInput[1] || null;
+      const channels = primaryInput[2] || null;
+      const size = parseInt(params.size, 10) || 2;
+      return [batch, len !== null ? len * size : null, channels];
+    }
+    case 'UpSampling2D': {
+      const batch = primaryInput[0];
+      const h = primaryInput[1] || null;
+      const w = primaryInput[2] || null;
+      const channels = primaryInput[3] || null;
+      const size = parseVariableTupleParam(params.size, 2);
+      const sh = size[0] || 2;
+      const sw = size[1] || 2;
+      return [batch, h !== null ? h * sh : null, w !== null ? w * sw : null, channels];
+    }
+    case 'UpSampling3D': {
+      const batch = primaryInput[0];
+      const d = primaryInput[1] || null;
+      const h = primaryInput[2] || null;
+      const w = primaryInput[3] || null;
+      const channels = primaryInput[4] || null;
+      const size = parseVariableTupleParam(params.size, 2);
+      const sd = size[0] || 2;
+      const sh = size[1] || 2;
+      const sw = size[2] || 2;
+      return [batch, d !== null ? d * sd : null, h !== null ? h * sh : null, w !== null ? w * sw : null, channels];
+    }
+    case 'ZeroPadding1D': {
+      const batch = primaryInput[0];
+      const len = primaryInput[1] || null;
+      const channels = primaryInput[2] || null;
+      const padding = parseVariableTupleParam(params.padding, 1);
+      const pLeft = padding[0] || 1;
+      const pRight = padding[1] || 1;
+      return [batch, len !== null ? len + pLeft + pRight : null, channels];
+    }
+    case 'ZeroPadding2D': {
+      const batch = primaryInput[0];
+      const h = primaryInput[1] || null;
+      const w = primaryInput[2] || null;
+      const channels = primaryInput[3] || null;
+      let pTop = 1, pBottom = 1, pLeft = 1, pRight = 1;
+      const padding = params.padding;
+      if (Array.isArray(padding)) {
+        if (Array.isArray(padding[0])) {
+          pTop = parseInt(padding[0][0], 10) || 0;
+          pBottom = parseInt(padding[0][1], 10) || 0;
+        } else {
+          pTop = parseInt(padding[0], 10) || 0;
+          pBottom = pTop;
+        }
+        if (Array.isArray(padding[1])) {
+          pLeft = parseInt(padding[1][0], 10) || 0;
+          pRight = parseInt(padding[1][1], 10) || 0;
+        } else {
+          pLeft = parseInt(padding[1], 10) || 0;
+          pRight = pLeft;
+        }
+      }
+      return [batch, h !== null ? h + pTop + pBottom : null, w !== null ? w + pLeft + pRight : null, channels];
+    }
+    case 'ZeroPadding3D': {
+      const batch = primaryInput[0];
+      const d = primaryInput[1] || null;
+      const h = primaryInput[2] || null;
+      const w = primaryInput[3] || null;
+      const channels = primaryInput[4] || null;
+      return [batch, d, h, w, channels];
+    }
+    case 'ReLU':
+    case 'Softmax':
+    case 'LeakyReLU':
+    case 'PReLU':
+    case 'ELU':
     case 'Dropout':
     case 'AlphaDropout':
     case 'GaussianDropout':
